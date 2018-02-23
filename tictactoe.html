@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+<meta charset="utf-8">
+<title>Tic Tac Toe</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<style>
+  body {
+    background-color: black;
+    color: white;
+    font-family:Courier New, Courier, monospace;
+  }
+
+  div {
+    display: block;
+  }
+
+  .canvas {
+    width: 400px;
+    height: 400px;
+  }
+  .board {
+    width: 100%;
+    height: 100%;
+  }
+
+  .square {
+    float: left;
+    width: 30.00%;
+    height: 30.00%;
+    cursor: pointer;
+    border-color: white;
+    border-width: 2px;
+    font-size: 84px;
+    text-align: center;
+    /*vertical-align: middle;*/
+    line-height: 150.00%;
+  }
+
+  .top {
+    border-bottom-style: solid;
+  }
+
+  .left {
+    border-right-style: solid;
+  }
+
+  .right {
+    border-left-style: solid;
+  }
+
+  .bottom {
+    border-top-style: solid;
+    /*clear: both;*/
+  }
+
+  #newGameButton {
+    border-style: outset;
+    color: white;
+    background-color:black;
+    width: 30%;
+    height: 32px;
+    font-size: 14px;
+    text-align: center;
+    float: left;
+    clear: none;
+  }
+
+  #messages {
+    float: left;
+    font-size: 20px;
+    width: 30%;
+    text-align: center;
+
+    /*border: 1px solid red;*/
+  }
+</style>
+<script src="prefixfree.min.js"></script>
+</head>
+
+<body>
+  <div class="canvas">
+    <div class="board">
+      <div id="1" class="square top left">&nbsp;</div>
+			<div id="2" class="square top">&nbsp;</div>
+			<div id="3" class="square top right">&nbsp;</div>
+			<div id="4" class="square left">&nbsp;</div>
+			<div id="5" class="square">&nbsp;</div>
+			<div id="6" class="square right">&nbsp;</div>
+			<div id="7" class="square bottom left">&nbsp;</div>
+			<div id="8" class="square bottom">&nbsp;</div>
+			<div id="9" class="square bottom right">&nbsp;</div>
+    </div>
+    <input id="newGameButton" type="button" value="New Game">
+    <div id="messages"></div>
+  </div>
+  <br />
+
+  <script>
+    "use strict";
+
+    var x = [
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0]
+    ];
+
+    var xTurn = true;
+    var clickCounter = 0;
+    var gameOver = false;
+
+    var messages = document.getElementById("messages");
+    messages.textContent = "X's turn";
+
+    function addEventListenerToSquares() {
+      var squares = document.getElementsByClassName("square");
+    
+      for (var i = 0; i < squares.length; i++) {
+        squares[i].addEventListener("click", clickSquare, false);
+      }
+    }
+
+    function clickSquare(ev) {
+        if(gameOver) {
+          return;
+        }
+
+      var square = ev.target;
+
+      if(square.textContent != "X" && square.textContent != "O") {
+        if(xTurn) {
+          square.textContent = "X";
+          messages.textContent = "O's turn";
+        }
+        else {
+          square.textContent = "O";
+          messages.textContent = "X's turn";
+        }
+
+        clickCounter++;
+        fillArray(square.id);
+        xTurn = !xTurn;
+      }
+    }
+
+    function fillArray(squareId) {
+      if (!xTurn)
+        x[squareId - 1] = 1;
+      else {
+        x[squareId - 1] = 5;
+      }
+
+      var score = updateScore();
+      
+      if (score != "") {
+        messages.textContent = score;
+        gameOver = true;
+        //drawWinnerLine();
+      } else if(clickCounter >= 9) {
+        messages.textContent = "Draw";
+        gameOver = true;
+      }
+    }
+
+    function updateScore() {
+      var t = "";
+
+      // row wins
+      if (x[0] + x[1] + x[2] == 3)  { t = "O wins!"; drawWinnerLine("r1"); }
+      if (x[0] + x[1] + x[2] == 15) { t = "X wins!"; drawWinnerLine("r1"); }
+      if (x[3] + x[4] + x[5] == 3)  { t = "O wins!"; drawWinnerLine("r2"); }
+      if (x[3] + x[4] + x[5] == 15) { t = "X wins!"; drawWinnerLine("r2"); }
+      if (x[6] + x[7] + x[8] == 3)  { t = "O wins!"; drawWinnerLine("r3"); }
+      if (x[6] + x[7] + x[8] == 15) { t = "X wins!"; drawWinnerLine("r3"); }
+
+      // column wins
+      if (x[0] + x[3] + x[6] == 3)  { t = "O wins!"; drawWinnerLine("c1"); }
+      if (x[0] + x[3] + x[6] == 15) { t = "X wins!"; drawWinnerLine("c1"); }
+      if (x[1] + x[4] + x[7] == 3)  { t = "O wins!"; drawWinnerLine("c2"); }
+      if (x[1] + x[4] + x[7] == 15) { t = "X wins!"; drawWinnerLine("c2"); }
+      if (x[2] + x[5] + x[8] == 3)  { t = "O wins!"; drawWinnerLine("c3"); }
+      if (x[2] + x[5] + x[8] == 15) { t = "X wins!"; drawWinnerLine("c3"); }
+
+      // diagonal wins
+      if (x[0] + x[4] + x[8] == 3)  { t = "O wins!"; drawWinnerLine("d1"); }
+      if (x[0] + x[4] + x[8] == 15) { t = "X wins!"; drawWinnerLine("d1"); }
+      if (x[2] + x[4] + x[6] == 3)  { t = "O wins!"; drawWinnerLine("d2"); }
+      if (x[2] + x[4] + x[6] == 15) { t = "X wins!"; drawWinnerLine("d2"); }
+
+      return t;
+    }
+
+    function drawWinnerLine(lineType) {
+      // TODO:
+    }
+
+    document.getElementById("newGameButton").addEventListener("click", function() {
+      var squares = document.getElementsByClassName("square");
+      
+      for (var i = 0; i < squares.length; i++) {
+        squares[i].textContent = " ";
+      }
+
+      //document.getElementById("turn").textContent = "Turn: X";
+      x.fill(0);
+      xTurn = true;
+      clickCounter = 0;
+      gameOver = false;
+
+      messages.textContent = "X's turn";
+
+      //document.getElementById("winner").style.visibility = "hidden";    
+      //var canvas = document.getElementById("winner");                   
+      //var ctx = canvas.getContext("2d");                            
+      //ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }, false);
+
+    addEventListenerToSquares();
+
+  </script>
+</body>
+</html>
